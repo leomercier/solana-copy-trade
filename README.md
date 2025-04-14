@@ -1,4 +1,7 @@
-# Solana Copy Trader Bot
+# Solana Copy Trader Bot (built with Firebase Studio)
+
+- [Firebase Studio](https://studio.firebase.google.com/)
+- [Gemini Pro 2.5](https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/)
 
 This is a Node.js application designed to monitor a specific Solana wallet for swap transactions executed via the Jupiter V6 aggregator and automatically replicate those trades on a target wallet.
 
@@ -6,20 +9,20 @@ This is a Node.js application designed to monitor a specific Solana wallet for s
 
 ## Features
 
-*   Monitors a specified Solana source wallet address for Jupiter V6 swap activity.
-*   Detects swaps involving SOL and SPL tokens.
-*   Uses the Jupiter V6 API (`/quote` and `/swap` endpoints) to fetch trade routes and construct transactions.
-*   Executes copy trades using a specified target wallet's private key.
-*   Configurable via environment variables.
-*   Basic logging for monitoring activity.
+- Monitors a specified Solana source wallet address for Jupiter V6 swap activity.
+- Detects swaps involving SOL and SPL tokens.
+- Uses the Jupiter V6 API (`/quote` and `/swap` endpoints) to fetch trade routes and construct transactions.
+- Executes copy trades using a specified target wallet's private key.
+- Configurable via environment variables.
+- Basic logging for monitoring activity.
 
 ## Prerequisites
 
-*   [Node.js](https://nodejs.org/) (v18 or later recommended)
-*   [npm](https://www.npmjs.com/) (usually included with Node.js)
-*   A Solana RPC endpoint URL (e.g., from Helius, Triton, QuickNode, or use the public `clusterApiUrl`). Mainnet-beta is required for real trades.
-*   A source Solana wallet address to monitor.
-*   A target Solana wallet (with its private key) to execute the copy trades. **Ensure this wallet is funded.**
+- [Node.js](https://nodejs.org/) (v18 or later recommended)
+- [npm](https://www.npmjs.com/) (usually included with Node.js)
+- A Solana RPC endpoint URL (e.g., from Helius, Triton, QuickNode, or use the public `clusterApiUrl`). Mainnet-beta is required for real trades.
+- A source Solana wallet address to monitor.
+- A target Solana wallet (with its private key) to execute the copy trades. **Ensure this wallet is funded.**
 
 ## Setup Instructions
 
@@ -28,6 +31,7 @@ This is a Node.js application designed to monitor a specific Solana wallet for s
 
 2.  **Install Dependencies:**
     Open a terminal in the project directory and run:
+
     ```bash
     npm install
     ```
@@ -67,20 +71,21 @@ This is a Node.js application designed to monitor a specific Solana wallet for s
 ## Running the Bot
 
 1.  **Using Firebase Studio / IDX:**
-    *   Ensure you have completed the Setup steps above within your IDX workspace.
-    *   Open a terminal within IDX (usually available at the bottom).
-    *   Run the bot using the start script defined in `package.json`:
-        ```bash
-        npm start
-        ```
+
+    - Ensure you have completed the Setup steps above within your IDX workspace.
+    - Open a terminal within IDX (usually available at the bottom).
+    - Run the bot using the start script defined in `package.json`:
+      ```bash
+      npm start
+      ```
 
 2.  **Using a Local Terminal:**
-    *   Navigate to the project directory in your terminal.
-    *   Ensure you have completed the Setup steps.
-    *   Run the bot:
-        ```bash
-        npm start
-        ```
+    - Navigate to the project directory in your terminal.
+    - Ensure you have completed the Setup steps.
+    - Run the bot:
+      ```bash
+      npm start
+      ```
 
 The bot will start, log the wallets it's monitoring and targeting, and begin listening for transactions from the source wallet. When a Jupiter swap is detected and processed, it will attempt to execute a copy trade.
 
@@ -91,24 +96,24 @@ The bot will start, log the wallets it's monitoring and targeting, and begin lis
 3.  **Transaction Fetching:** When a potential Jupiter transaction is detected via logs, the full transaction details are fetched using its signature.
 4.  **Analysis:** The transaction details (including account keys and token balance changes) are analyzed to confirm it's a Jupiter V6 swap and to determine the input and output tokens and amounts for the source wallet.
 5.  **Copy Trade Execution:**
-    *   **(NEEDS MODIFICATION)** Calculates the amount for the target trade. **Currently hardcoded to `10000` lamports/smallest unit.** This needs to be updated to use `TRADE_PROPORTION` and potentially price data.
-    *   Calls the Jupiter `/quote` API to find the best route for the calculated target trade amount.
-    *   Calls the Jupiter `/swap` API with the quote response to get a serialized transaction.
-    *   Signs the transaction using the `TARGET_WALLET_PRIVATE_KEY`.
-    *   Sends the signed transaction to the Solana network.
-    *   Confirms the transaction.
+    - **(NEEDS MODIFICATION)** Calculates the amount for the target trade. **Currently hardcoded to `10000` lamports/smallest unit.** This needs to be updated to use `TRADE_PROPORTION` and potentially price data.
+    - Calls the Jupiter `/quote` API to find the best route for the calculated target trade amount.
+    - Calls the Jupiter `/swap` API with the quote response to get a serialized transaction.
+    - Signs the transaction using the `TARGET_WALLET_PRIVATE_KEY`.
+    - Sends the signed transaction to the Solana network.
+    - Confirms the transaction.
 
 ## Important Considerations & Limitations
 
-*   **CRITICAL: Hardcoded Trade Amount:** The `executeCopyTrade` function currently uses a fixed `targetInputAmount` of `10000` smallest units (e.g., lamports for SOL). You **MUST** modify the logic to calculate the desired trade amount based on `TRADE_PROPORTION`, source amounts, token prices, and target wallet balance before using it for significant trades.
-*   **Minimum Trade Value:** The check for `MIN_TRADE_VALUE_USD` is currently commented out and requires implementing price fetching logic.
-*   **Security:** Storing private keys in `.env` files has risks. Consider more secure key management solutions (like hardware wallets or dedicated key management services) for production use cases. Exposing private keys can lead to a complete loss of funds.
-*   **RPC Limitations:** Public RPC endpoints have rate limits and can be unreliable. Using a dedicated RPC provider is highly recommended for stability.
-*   **Jupiter API:** The bot relies on the Jupiter V6 API. Changes to the API could break the bot.
-*   **Transaction Costs:** Copy trades incur Solana network fees and potentially Jupiter platform fees. Ensure the target wallet has enough SOL to cover these costs.
-*   **Slippage:** Market price fluctuations between the source trade and the copy trade attempt can lead to different execution prices (slippage). The Jupiter API allows setting slippage tolerance.
-*   **Error Handling:** While basic error handling exists, edge cases (e.g., network congestion, specific Jupiter errors, insufficient target funds) might not be fully covered.
-*   **Detection Accuracy:** Relying solely on logs and program IDs for detection might miss some trades or incorrectly identify others (though checks on transaction details improve accuracy).
+- **CRITICAL: Hardcoded Trade Amount:** The `executeCopyTrade` function currently uses a fixed `targetInputAmount` of `10000` smallest units (e.g., lamports for SOL). You **MUST** modify the logic to calculate the desired trade amount based on `TRADE_PROPORTION`, source amounts, token prices, and target wallet balance before using it for significant trades.
+- **Minimum Trade Value:** The check for `MIN_TRADE_VALUE_USD` is currently commented out and requires implementing price fetching logic.
+- **Security:** Storing private keys in `.env` files has risks. Consider more secure key management solutions (like hardware wallets or dedicated key management services) for production use cases. Exposing private keys can lead to a complete loss of funds.
+- **RPC Limitations:** Public RPC endpoints have rate limits and can be unreliable. Using a dedicated RPC provider is highly recommended for stability.
+- **Jupiter API:** The bot relies on the Jupiter V6 API. Changes to the API could break the bot.
+- **Transaction Costs:** Copy trades incur Solana network fees and potentially Jupiter platform fees. Ensure the target wallet has enough SOL to cover these costs.
+- **Slippage:** Market price fluctuations between the source trade and the copy trade attempt can lead to different execution prices (slippage). The Jupiter API allows setting slippage tolerance.
+- **Error Handling:** While basic error handling exists, edge cases (e.g., network congestion, specific Jupiter errors, insufficient target funds) might not be fully covered.
+- **Detection Accuracy:** Relying solely on logs and program IDs for detection might miss some trades or incorrectly identify others (though checks on transaction details improve accuracy).
 
 ## Contributing
 
